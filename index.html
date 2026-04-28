@@ -1,190 +1,240 @@
+html_content = """
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ใบรับรองการอบรม - BDMN Healthcare</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>premium-certificate-bdmn</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+
         body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
+            font-family: 'Sarabun', sans-serif;
+            -webkit-print-color-adjust: exact; /* สำหรับ Chrome/Safari */
+            print-color-adjust: exact;
         }
 
+        /* ภาชนะหลักขนาด A4 แนวนอน */
         .certificate-container {
             width: 297mm;
             height: 210mm;
-            background-color: white;
-            padding: 40px;
+            background: white;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 15px solid #1e3a8a;
-            box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             overflow: hidden;
+            border: 2px solid #ddd;
+        }
+
+        /* กรอบสีน้ำเงินและทองด้านใน */
+        .outer-border {
+            position: absolute;
+            top: 15mm;
+            left: 15mm;
+            right: 15mm;
+            bottom: 15mm;
+            border: 8px solid #003a5d; /* Navy Blue */
+            box-sizing: border-box;
         }
 
         .inner-border {
-            border: 2px solid #d4af37;
-            height: 100%;
-            width: 100%;
-            padding: 40px;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px solid #c5a059; /* Gold */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,250,250,1) 100%);
+            padding: 10mm;
+            background-color: rgba(255, 255, 255, 0.95); /* เผื่อลายน้ำ */
         }
 
-        /* Watermark */
+        /* ลายน้ำโลโก้ (จำลอง) */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.03;
-            z-index: 0;
-            pointer-events: none;
+            font-size: 150pt;
+            color: rgba(0, 58, 93, 0.03); /* จางมากๆ */
+            font-weight: bold;
+            z-index: -1;
+            white-space: nowrap;
         }
 
-        .content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
+        /* ส่วนหัว */
+        .header {
             width: 100%;
+            text-align: center;
+            margin-bottom: 5mm;
         }
 
-        .input-line {
-            border-bottom: 2px solid #333;
+        .company-name-th { font-size: 20pt; font-weight: 700; color: #003a5d; margin: 0; }
+        .company-name-en { font-size: 12pt; font-weight: 300; color: #666; margin: 0; text-transform: uppercase; letter-spacing: 2px;}
+        
+        /* เส้นคั่น */
+        .divider {
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #c5a059, transparent);
+            margin: 8mm 0;
+        }
+
+        /* ชื่อใบรับรอง */
+        .certificate-title {
+            font-size: 36pt;
+            font-weight: 700;
+            color: #003a5d;
+            margin: 5mm 0;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        /* เนื้อหา */
+        .content {
+            font-size: 16pt;
+            color: #333;
+            margin-bottom: 5mm;
+        }
+
+        /* ช่องใส่ชื่อ (editable) */
+        .name-field {
+            font-size: 32pt;
+            font-weight: 600;
+            color: #000;
+            border-bottom: 2px solid #c5a059;
+            width: 80%;
+            margin: 10mm auto;
+            padding: 2mm 0;
+            cursor: text;
+            min-height: 40pt;
+        }
+
+        /* ชื่อหลักสูตร */
+        .course-name {
+            font-size: 26pt;
+            font-weight: 700;
+            color: #c5a059;
+            background-color: #003a5d;
+            padding: 3mm 15mm;
+            border-radius: 5px;
+            margin: 8mm 0;
             display: inline-block;
-            min-width: 400px;
-            margin: 10px 0;
-            padding: 5px 20px;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #1e3a8a;
         }
 
-        .print-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #1e3a8a;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            font-weight: bold;
-            transition: all 0.2s;
-            z-index: 100;
+        /* ส่วนท้าย (ลายเซ็นและวันที่) */
+        .footer {
+            width: 90%;
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto; /* ดันลงล่างสุด */
+            padding-bottom: 5mm;
         }
 
-        .print-btn:hover {
-            background-color: #1e40af;
-            transform: translateY(-2px);
+        .signature-group, .date-group {
+            width: 35%;
+            text-align: center;
         }
 
+        .signature-line, .date-line {
+            border-top: 1px solid #333;
+            margin-top: 15mm;
+            padding-top: 2mm;
+        }
+
+        .editable-label {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #003a5d;
+            cursor: text;
+        }
+
+        .sub-label {
+            font-size: 11pt;
+            color: #666;
+            margin: 0;
+        }
+
+        /* ตราประทับจำลอง */
+        .stamp-placeholder {
+            width: 30mm;
+            height: 30mm;
+            border: 2px dashed #c5a059;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c5a059;
+            font-size: 8pt;
+            text-align: center;
+            position: absolute;
+            bottom: 25mm;
+            left: calc(50% - 15mm);
+        }
+
+        /* สไตล์สำหรับการพิมพ์ */
         @media print {
-            body {
-                background: none;
-                padding: 0;
-            }
-            .print-btn {
-                display: none;
-            }
-            .certificate-container {
-                box-shadow: none;
-                margin: 0;
-            }
+            body { background: none; }
+            .certificate-container { box-shadow: none; border: none; margin: 0; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
 <body>
-
-    <button class="print-btn" onclick="window.print()">พิมพ์ใบรับรอง (PDF/Print)</button>
-
     <div class="certificate-container">
-        <!-- SVG Watermark for decoration -->
-        <div class="watermark">
-            <svg width="600" height="600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-            </svg>
-        </div>
+        <div class="watermark">BDMN</div>
 
-        <div class="inner-border">
-            <!-- Header Section -->
-            <div class="content">
-                <div class="flex items-center justify-center mb-4">
-                    <div class="w-16 h-16 bg-blue-900 rounded-full flex items-center justify-center text-white mr-4">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a2 2 0 00-1.96.808l-1.014 1.455a11.042 11.042 0 01-5.105-5.105l1.455-1.014a2 2 0 00.808-1.96l-.477-2.387a2 2 0 00-.547-1.022L7.93 4.07a2 2 0 00-2.817.106L3.306 6.233a2 2 0 00-.446 2.148 21.113 21.113 0 0011.66 11.66 2 2 0 002.148-.446l2.057-2.057a2 2 0 00.106-2.817l-1.422-1.422z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold text-blue-900 tracking-wide uppercase">บริษัท บีดีเอ็มเอ็น เฮลท์แคร์ จำกัด</h1>
-                        <p class="text-gray-600 text-lg">BDMN Healthcare Co., Ltd.</p>
-                    </div>
-                </div>
+        <div class="outer-border">
+            <div class="inner-border">
                 
-                <div class="my-8">
-                    <h2 class="text-5xl font-bold text-gray-800 uppercase tracking-widest">ใบรับรองการอบรม</h2>
-                    <p class="text-xl text-gray-500 mt-2">CERTIFICATE OF COMPLETION</p>
+                <div class="header">
+                    <p class="company-name-th">บริษัท บีดีเอ็มเอ็น เฮลท์แคร์ จำกัด</p>
+                    <p class="company-name-en">BDMN Healthcare Co., Ltd.</p>
                 </div>
-            </div>
 
-            <!-- Recipient Section -->
-            <div class="content">
-                <p class="text-xl text-gray-700">ขอมอบใบประกาศนียบัตรฉบับนี้เพื่อแสดงว่า</p>
-                <div class="mt-4">
-                    <span class="input-line" contenteditable="true">ใส่ชื่อผู้เข้าร่วมอบรมที่นี่</span>
-                </div>
-            </div>
+                <div class="divider"></div>
 
-            <!-- Course Section -->
-            <div class="content">
-                <p class="text-xl text-gray-700">ได้ผ่านการอบรมตามเกณฑ์มาตรฐานใน</p>
-                <h3 class="text-3xl font-bold text-blue-800 my-4 italic">“หลักสูตรการช่วยชีวิตขั้นพื้นฐาน (Basic Life Support)”</h3>
-                <p class="text-lg text-gray-600">
-                    จัดการอบรมโดย บริษัท บีดีเอ็มเอ็น เฮลท์แคร์ จำกัด
-                </p>
-            </div>
+                <div class="certificate-title">CERTIFICATE</div>
+                <div class="content">ขอมอบใบประกาศนียบัตรฉบับนี้เพื่อแสดงว่า</div>
 
-            <!-- Footer / Signatures Section -->
-            <div class="content w-full px-20 flex justify-between items-end mt-10">
-                <div class="text-center w-64">
-                    <div class="border-b border-gray-400 mb-2 h-12 flex items-center justify-center">
-                        <span contenteditable="true" class="text-sm text-gray-400">ระบุวันที่</span>
+                <div class="name-field" contenteditable="true">พิมพ์ชื่อผู้เข้าร่วมอบรมที่นี่</div>
+
+                <div class="content">ได้ผ่านการอบรมตามเกณฑ์มาตรฐานใน</div>
+                
+                <div class="course-name">หลักสูตร กู้ชีพ พื้นฐาน</div>
+
+                <div class="stamp-placeholder">ตราประทับ<br>(ถ้ามี)</div>
+
+                <div class="footer">
+                    <div class="signature-group">
+                        <div class="signature-line">
+                            <div class="editable-label" contenteditable="true">พิมพ์ชื่อผู้อบรม / วิทยากร</div>
+                            <p class="sub-label">ผู้อบรมและประเมินผล</p>
+                        </div>
                     </div>
-                    <p class="font-semibold text-gray-700">วันที่ให้ไว้</p>
-                </div>
-
-                <!-- Gold Seal Mockup -->
-                <div class="flex flex-col items-center justify-center">
-                    <div class="w-24 h-24 rounded-full border-4 border-yellow-500 flex items-center justify-center bg-yellow-50 shadow-inner">
-                        <div class="text-yellow-600 font-bold text-center text-xs">
-                            BDMN<br>QUALITY
+                    <div class="date-group">
+                        <div class="date-line">
+                            <div class="editable-label" contenteditable="true">วันที่ .... / .... / ....</div>
+                            <p class="sub-label">วันที่ให้ไว้</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-center w-64">
-                    <div class="border-b border-gray-400 mb-2 h-12 flex items-center justify-center">
-                        <!-- Space for signature -->
-                    </div>
-                    <p class="font-bold text-blue-900" contenteditable="true">ชื่อผู้อบรม / ผู้ลงนาม</p>
-                    <p class="text-sm text-gray-600">วิทยากรผู้เชี่ยวชาญ</p>
-                </div>
             </div>
         </div>
     </div>
 
+    <div class="no-print" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button onclick="window.print()" style="padding: 12px 24px; font-size: 16px; font-weight: bold; color: white; background-color: #003a5d; border: 2px solid #c5a059; border-radius: 5px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+            พิมพ์ / บันทึก PDF
+        </button>
+    </div>
 </body>
 </html>
